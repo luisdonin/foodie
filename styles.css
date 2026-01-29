@@ -484,6 +484,80 @@ footer {
     color: #333;
 }
 
+/* Histórico de compras */
+.history-container {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.history-header h2 {
+    font-size: 1.3rem;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.history-header p {
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.history-empty {
+    text-align: center;
+    padding: 20px;
+    color: #777;
+    background: #f8f9fa;
+    border-radius: 10px;
+    font-size: 0.95rem;
+}
+
+.history-card {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.history-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 700;
+    color: #333;
+}
+
+.history-card-title {
+    font-size: 1rem;
+}
+
+.history-card-total {
+    color: #667eea;
+}
+
+.history-card-meta {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.history-items {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.95rem;
+    color: #333;
+}
+
 .profile-picture-section {
     display: flex;
     flex-direction: column;
@@ -860,5 +934,17 @@ footer {
     .market-actions {
         grid-column: span 2;
         justify-content: flex-end;
+    }
+
+    .history-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+
+    .history-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
     }
 }

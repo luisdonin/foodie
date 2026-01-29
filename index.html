@@ -18,6 +18,7 @@
             <button class="tab-btn active" id="tabDiet" data-tab="diet">📊 Dieta</button>
             <button class="tab-btn" id="tabProfile" data-tab="profile">👤 Perfil</button>
             <button class="tab-btn" id="tabMarket" data-tab="market">🛒 Mercado</button>
+            <button class="tab-btn" id="tabHistory" data-tab="history">🧾 Histórico</button>
         </div>
 
         <!-- Seção de Dieta -->
@@ -135,6 +136,19 @@
                     <span>Valor total</span>
                     <span id="marketTotal">R$ 0,00</span>
                 </div>
+
+                <button class="btn btn-primary" id="confirmMarketBtn">✅ Confirmar lista de compras</button>
+            </div>
+        </div>
+
+        <!-- Seção de Histórico de compras -->
+        <div class="tab-content" id="historyTab">
+            <div class="history-container">
+                <div class="history-header">
+                    <h2>Histórico de compras</h2>
+                    <p>Listas confirmadas anteriormente</p>
+                </div>
+                <div id="historyList"></div>
             </div>
         </div>
 

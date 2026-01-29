@@ -242,12 +242,14 @@ const CUSTOM_ITEMS_KEY = 'dietCustomItems';
 const PROFILE_KEY = 'userProfile';
 const XP_KEY = 'userXP';
 const MARKET_KEY = 'marketList';
+const MARKET_HISTORY_KEY = 'marketHistory';
 let checkedItems = {};
 let customItems = {};
 let currentEditingItemId = null;
 let userProfile = {};
 let userXP = { level: 1, totalXP: 0 };
 let marketItems = [];
+let marketHistory = [];
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -255,8 +257,10 @@ document.addEventListener('DOMContentLoaded', () => {
     loadProfile();
     loadXP();
     loadMarketList();
+    loadMarketHistory();
     renderDays();
     renderMarketItems();
+    renderMarketHistory();
     setupEventListeners();
     setupTabNavigation();
     setupProfileListeners();
@@ -781,10 +785,20 @@ function saveMarketList() {
     localStorage.setItem(MARKET_KEY, JSON.stringify(marketItems));
 }
 
+function loadMarketHistory() {
+    const saved = localStorage.getItem(MARKET_HISTORY_KEY);
+    marketHistory = saved ? JSON.parse(saved) : [];
+}
+
+function saveMarketHistory() {
+    localStorage.setItem(MARKET_HISTORY_KEY, JSON.stringify(marketHistory));
+}
+
 function setupMarketListeners() {
     const form = document.getElementById('marketForm');
     const addBtn = document.getElementById('addMarketItemBtn');
     const itemsContainer = document.getElementById('marketItems');
+    const confirmBtn = document.getElementById('confirmMarketBtn');
 
     if (!form || !addBtn || !itemsContainer) {
         return;
@@ -804,6 +818,12 @@ function setupMarketListeners() {
         const itemId = deleteBtn.getAttribute('data-market-delete');
         removeMarketItem(itemId);
     });
+
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', () => {
+            confirmMarketList();
+        });
+    }
 }
 
 function handleAddMarketItem() {
@@ -911,6 +931,102 @@ function renderMarketItems() {
     });
 
     totalEl.textContent = formatCurrency(total);
+}
+
+function confirmMarketList() {
+    if (!marketItems.length) {
+        alert('Adicione itens antes de confirmar a lista.');
+        return;
+    }
+
+    const total = marketItems.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+    const entry = {
+        id: `history-${Date.now()}`,
+        createdAt: new Date().toISOString(),
+        total,
+        items: marketItems.map(item => ({
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price
+        }))
+    };
+
+    marketHistory.unshift(entry);
+    saveMarketHistory();
+
+    marketItems = [];
+    saveMarketList();
+    renderMarketItems();
+    renderMarketHistory();
+
+    alert('✅ Lista confirmada e salva no histórico!');
+}
+
+function renderMarketHistory() {
+    const container = document.getElementById('historyList');
+    if (!container) {
+        return;
+    }
+
+    container.innerHTML = '';
+
+    if (!marketHistory.length) {
+        const empty = document.createElement('div');
+        empty.className = 'history-empty';
+        empty.textContent = 'Nenhuma compra confirmada ainda.';
+        container.appendChild(empty);
+        return;
+    }
+
+    marketHistory.forEach(entry => {
+        const card = document.createElement('div');
+        card.className = 'history-card';
+
+        const header = document.createElement('div');
+        header.className = 'history-card-header';
+
+        const title = document.createElement('div');
+        title.className = 'history-card-title';
+        title.textContent = formatHistoryDate(entry.createdAt);
+
+        const total = document.createElement('div');
+        total.className = 'history-card-total';
+        total.textContent = formatCurrency(entry.total);
+
+        header.appendChild(title);
+        header.appendChild(total);
+
+        const meta = document.createElement('div');
+        meta.className = 'history-card-meta';
+        meta.textContent = `${entry.items.length} item(ns)`;
+
+        const list = document.createElement('div');
+        list.className = 'history-items';
+
+        entry.items.forEach(item => {
+            const row = document.createElement('div');
+            row.className = 'history-item';
+            row.innerHTML = `
+                <span>${item.name}</span>
+                <span>${item.quantity} x ${formatCurrency(item.price)}</span>
+            `;
+            list.appendChild(row);
+        });
+
+        card.appendChild(header);
+        card.appendChild(meta);
+        card.appendChild(list);
+
+        container.appendChild(card);
+    });
+}
+
+function formatHistoryDate(isoString) {
+    const date = new Date(isoString);
+    return date.toLocaleString('pt-BR', {
+        dateStyle: 'medium',
+        timeStyle: 'short'
+    });
 }
 
 function formatCurrency(value) {
