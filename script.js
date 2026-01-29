@@ -238,24 +238,36 @@ const dietPlan = [
 
 // Storage keys
 const STORAGE_KEY = 'dietProgress';
+const CUSTOM_ITEMS_KEY = 'dietCustomItems';
+const PROFILE_KEY = 'userProfile';
 let checkedItems = {};
+let customItems = {};
+let currentEditingItemId = null;
+let userProfile = {};
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     loadProgress();
+    loadProfile();
     renderDays();
     setupEventListeners();
+    setupTabNavigation();
+    setupProfileListeners();
 });
 
 // Load progress from localStorage
 function loadProgress() {
     const saved = localStorage.getItem(STORAGE_KEY);
     checkedItems = saved ? JSON.parse(saved) : {};
+    
+    const savedCustom = localStorage.getItem(CUSTOM_ITEMS_KEY);
+    customItems = savedCustom ? JSON.parse(savedCustom) : {};
 }
 
 // Save progress to localStorage
 function saveProgress() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(checkedItems));
+    localStorage.setItem(CUSTOM_ITEMS_KEY, JSON.stringify(customItems));
     updateProgressBar();
 }
 
@@ -322,9 +334,18 @@ function createMealElement(dayNumber, meal) {
     meal.items.forEach((item, index) => {
         const itemId = `day${dayNumber}-meal${meal.name.replace(/\s+/g, '')}-item${index}`;
         const isChecked = checkedItems[itemId] || false;
+        
+        // Get custom text if exists
+        const displayText = customItems[itemId] || item;
 
         const itemEl = document.createElement('div');
         itemEl.className = 'meal-item';
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'meal-item-wrapper';
+
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'meal-item-content';
 
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
@@ -338,10 +359,36 @@ function createMealElement(dayNumber, meal) {
 
         const label = document.createElement('label');
         label.htmlFor = itemId;
-        label.textContent = item;
+        label.textContent = displayText;
 
-        itemEl.appendChild(checkbox);
-        itemEl.appendChild(label);
+        contentDiv.appendChild(checkbox);
+        contentDiv.appendChild(label);
+
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'meal-item-actions';
+
+        const editBtn = document.createElement('button');
+        editBtn.className = 'btn-icon edit';
+        editBtn.textContent = '✏️';
+        editBtn.onclick = (e) => {
+            e.preventDefault();
+            openEditModal(itemId, displayText);
+        };
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn-icon delete';
+        deleteBtn.textContent = '🗑️';
+        deleteBtn.onclick = (e) => {
+            e.preventDefault();
+            deleteCustomItem(itemId, itemEl, dayNumber);
+        };
+
+        actionsDiv.appendChild(editBtn);
+        actionsDiv.appendChild(deleteBtn);
+
+        wrapper.appendChild(contentDiv);
+        wrapper.appendChild(actionsDiv);
+        itemEl.appendChild(wrapper);
         itemsContainer.appendChild(itemEl);
     });
 
@@ -428,6 +475,245 @@ function setupEventListeners() {
             });
             
             updateProgressBar();
+        }
+    });
+
+    // Modal listeners
+    const modal = document.getElementById('editModal');
+    const closeModal = document.getElementById('closeModal');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const deleteBtn = document.getElementById('deleteBtn');
+    const editInput = document.getElementById('editInput');
+
+    const closeEditModal = () => {
+        modal.classList.remove('active');
+        currentEditingItemId = null;
+        editInput.value = '';
+    };
+
+    closeModal.onclick = closeEditModal;
+    cancelBtn.onclick = closeEditModal;
+
+    saveBtn.onclick = () => {
+        const newText = editInput.value.trim();
+        if (newText && currentEditingItemId) {
+            customItems[currentEditingItemId] = newText;
+            saveProgress();
+            
+            // Find the day number from itemId
+            const dayMatch = currentEditingItemId.match(/day(\d+)/);
+            if (dayMatch) {
+                updateDayProgress(parseInt(dayMatch[1]));
+                
+                // Update label text
+                const label = document.querySelector(`label[for="${currentEditingItemId}"]`);
+                if (label) {
+                    label.textContent = newText;
+                }
+            }
+            
+            closeEditModal();
+        }
+    };
+
+    deleteBtn.onclick = () => {
+        if (currentEditingItemId) {
+            delete customItems[currentEditingItemId];
+            saveProgress();
+            
+            const dayMatch = currentEditingItemId.match(/day(\d+)/);
+            if (dayMatch) {
+                // Reset to original item text
+                const label = document.querySelector(`label[for="${currentEditingItemId}"]`);
+                if (label) {
+                    // Find original item text from dietPlan
+                    const dayNum = parseInt(dayMatch[1]);
+                    const originalItem = findOriginalItemText(currentEditingItemId);
+                    if (originalItem) {
+                        label.textContent = originalItem;
+                    }
+                }
+                updateDayProgress(parseInt(dayMatch[1]));
+            }
+            
+            closeEditModal();
+        }
+    };
+
+    editInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            saveBtn.click();
+        }
+    });
+
+    // Close modal when clicking outside
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeEditModal();
+        }
+    });
+}
+
+// Open edit modal
+function openEditModal(itemId, currentText) {
+    const modal = document.getElementById('editModal');
+    const editInput = document.getElementById('editInput');
+    
+    currentEditingItemId = itemId;
+    editInput.value = currentText;
+    modal.classList.add('active');
+    editInput.focus();
+    editInput.select();
+}
+
+// Find original item text from dietPlan
+function findOriginalItemText(itemId) {
+    const dayMatch = itemId.match(/day(\d+)/);
+    if (!dayMatch) return null;
+    
+    const dayNum = parseInt(dayMatch[1]);
+    const day = dietPlan[dayNum - 1];
+    
+    if (!day) return null;
+    
+    for (const meal of day.meals) {
+        for (let i = 0; i < meal.items.length; i++) {
+            const testId = `day${dayNum}-meal${meal.name.replace(/\s+/g, '')}-item${i}`;
+            if (testId === itemId) {
+                return meal.items[i];
+            }
+        }
+    }
+    
+    return null;
+}
+
+// Delete custom item
+function deleteCustomItem(itemId, itemElement, dayNumber) {
+    delete customItems[itemId];
+    saveProgress();
+    updateDayProgress(dayNumber);
+    
+    // Reset label text to original
+    const label = document.querySelector(`label[for="${itemId}"]`);
+    const originalText = findOriginalItemText(itemId);
+    if (label && originalText) {
+        label.textContent = originalText;
+    }
+}
+
+// Carregar perfil
+function loadProfile() {
+    const saved = localStorage.getItem(PROFILE_KEY);
+    userProfile = saved ? JSON.parse(saved) : {
+        name: '',
+        weight: '',
+        height: '',
+        photo: ''
+    };
+    
+    // Carregar dados nos inputs
+    document.getElementById('profileName').value = userProfile.name || '';
+    document.getElementById('profileWeight').value = userProfile.weight || '';
+    document.getElementById('profileHeight').value = userProfile.height || '';
+    
+    if (userProfile.photo) {
+        document.getElementById('profileImage').src = userProfile.photo;
+    }
+    
+    updateIMC();
+}
+
+// Salvar perfil
+function saveProfile() {
+    userProfile = {
+        name: document.getElementById('profileName').value,
+        weight: document.getElementById('profileWeight').value,
+        height: document.getElementById('profileHeight').value,
+        photo: document.getElementById('profileImage').src
+    };
+    
+    localStorage.setItem(PROFILE_KEY, JSON.stringify(userProfile));
+    updateIMC();
+    alert('✅ Perfil salvo com sucesso!');
+}
+
+// Calcular e atualizar IMC
+function updateIMC() {
+    const weight = parseFloat(document.getElementById('profileWeight').value);
+    const height = parseFloat(document.getElementById('profileHeight').value) / 100; // converter para metros
+    
+    if (weight > 0 && height > 0) {
+        const imc = (weight / (height * height)).toFixed(1);
+        document.getElementById('imcValue').textContent = imc;
+        
+        let category = '';
+        if (imc < 18.5) {
+            category = 'Abaixo do peso';
+        } else if (imc < 25) {
+            category = 'Peso normal';
+        } else if (imc < 30) {
+            category = 'Sobrepeso';
+        } else {
+            category = 'Obesidade';
+        }
+        
+        document.getElementById('imcCategory').textContent = category;
+    } else {
+        document.getElementById('imcValue').textContent = '--';
+        document.getElementById('imcCategory').textContent = '';
+    }
+}
+
+// Setup abas de navegação
+function setupTabNavigation() {
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const tabName = button.getAttribute('data-tab');
+            
+            // Remove active de todos
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            // Adiciona active ao clicado
+            button.classList.add('active');
+            document.getElementById(tabName + 'Tab').classList.add('active');
+        });
+    });
+}
+
+// Setup event listeners do perfil
+function setupProfileListeners() {
+    document.getElementById('photoInput').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                document.getElementById('profileImage').src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+    
+    document.getElementById('profileWeight').addEventListener('input', updateIMC);
+    document.getElementById('profileHeight').addEventListener('input', updateIMC);
+    
+    document.getElementById('saveProfileBtn').addEventListener('click', saveProfile);
+    
+    document.getElementById('clearProfileBtn').addEventListener('click', () => {
+        if (confirm('Deseja limpar todos os dados do perfil?')) {
+            document.getElementById('profileName').value = '';
+            document.getElementById('profileWeight').value = '';
+            document.getElementById('profileHeight').value = '';
+            document.getElementById('profileImage').src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Ccircle cx='100' cy='100' r='100' fill='%23e9ecef'/%3E%3Ccircle cx='100' cy='70' r='35' fill='%23999'/%3E%3Cellipse cx='100' cy='160' rx='50' ry='40' fill='%23999'/%3E%3C/svg%3E";
+            localStorage.removeItem(PROFILE_KEY);
+            userProfile = {};
+            updateIMC();
+            alert('✅ Dados do perfil limpos!');
         }
     });
 }

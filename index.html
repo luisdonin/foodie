@@ -13,21 +13,89 @@
             <p class="subtitle">Plano de 5 dias</p>
         </header>
 
-        <div class="stats">
-            <div class="stat-item">
-                <span class="stat-label">Progresso</span>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill"></div>
+        <!-- Abas de navegação -->
+        <div class="nav-tabs">
+            <button class="tab-btn active" id="tabDiet" data-tab="diet">📊 Dieta</button>
+            <button class="tab-btn" id="tabProfile" data-tab="profile">👤 Perfil</button>
+        </div>
+
+        <!-- Seção de Dieta -->
+        <div class="tab-content active" id="dietTab">
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-label">Progresso</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <span class="stat-value" id="progressText">0/0</span>
                 </div>
-                <span class="stat-value" id="progressText">0/0</span>
+            </div>
+
+            <div class="days-container" id="daysContainer"></div>
+
+            <footer>
+                <button class="btn-reset" id="resetBtn">Limpar Progresso</button>
+            </footer>
+        </div>
+
+        <!-- Seção de Perfil -->
+        <div class="tab-content" id="profileTab">
+            <div class="profile-container">
+                <div class="profile-picture-section">
+                    <img id="profileImage" class="profile-picture" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Ccircle cx='100' cy='100' r='100' fill='%23e9ecef'/%3E%3Ccircle cx='100' cy='70' r='35' fill='%23999'/%3E%3Cellipse cx='100' cy='160' rx='50' ry='40' fill='%23999'/%3E%3C/svg%3E" alt="Foto de Perfil">
+                    <label for="photoInput" class="photo-upload-btn">📷</label>
+                    <input type="file" id="photoInput" accept="image/*" hidden>
+                </div>
+
+                <div class="profile-form">
+                    <div class="form-group">
+                        <label for="profileName">Nome</label>
+                        <input type="text" id="profileName" placeholder="Digite seu nome" maxlength="50">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="profileWeight">Peso (kg)</label>
+                        <input type="number" id="profileWeight" placeholder="Digite seu peso" step="0.1" min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="profileHeight">Altura (cm)</label>
+                        <input type="number" id="profileHeight" placeholder="Digite sua altura" step="0.1" min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="profileIMC">IMC</label>
+                        <div class="imc-display">
+                            <span id="imcValue">--</span>
+                            <span id="imcCategory"></span>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button class="btn btn-primary" id="saveProfileBtn">💾 Salvar Perfil</button>
+                        <button class="btn btn-secondary" id="clearProfileBtn">🗑️ Limpar Dados</button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="days-container" id="daysContainer"></div>
-
-        <footer>
-            <button class="btn-reset" id="resetBtn">Limpar Progresso</button>
-        </footer>
+        <!-- Modal de edição -->
+        <div class="modal" id="editModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Editar Item</h2>
+                    <button class="btn-close" id="closeModal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="editInput" placeholder="Digite o novo texto" maxlength="100">
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="cancelBtn">Cancelar</button>
+                    <button class="btn btn-primary" id="saveBtn">Salvar</button>
+                    <button class="btn btn-danger" id="deleteBtn">Deletar</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>
