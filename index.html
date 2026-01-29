@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acompanhamento de Dieta</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🍎 Minha Dieta</h1>
+            <p class="subtitle">Plano de 5 dias</p>
+        </header>
+
+        <div class="stats">
+            <div class="stat-item">
+                <span class="stat-label">Progresso</span>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <span class="stat-value" id="progressText">0/0</span>
+            </div>
+        </div>
+
+        <div class="days-container" id="daysContainer"></div>
+
+        <footer>
+            <button class="btn-reset" id="resetBtn">Limpar Progresso</button>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
