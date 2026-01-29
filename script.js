@@ -241,21 +241,26 @@ const STORAGE_KEY = 'dietProgress';
 const CUSTOM_ITEMS_KEY = 'dietCustomItems';
 const PROFILE_KEY = 'userProfile';
 const XP_KEY = 'userXP';
+const MARKET_KEY = 'marketList';
 let checkedItems = {};
 let customItems = {};
 let currentEditingItemId = null;
 let userProfile = {};
 let userXP = { level: 1, totalXP: 0 };
+let marketItems = [];
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     loadProgress();
     loadProfile();
     loadXP();
+    loadMarketList();
     renderDays();
+    renderMarketItems();
     setupEventListeners();
     setupTabNavigation();
     setupProfileListeners();
+    setupMarketListeners();
     updateXPDisplay();
 });
 
@@ -762,6 +767,157 @@ function updateIMC() {
         document.getElementById('imcValue').textContent = '--';
         document.getElementById('imcCategory').textContent = '';
     }
+}
+
+// =========================
+// Mercado (Lista de compras)
+// =========================
+function loadMarketList() {
+    const saved = localStorage.getItem(MARKET_KEY);
+    marketItems = saved ? JSON.parse(saved) : [];
+}
+
+function saveMarketList() {
+    localStorage.setItem(MARKET_KEY, JSON.stringify(marketItems));
+}
+
+function setupMarketListeners() {
+    const form = document.getElementById('marketForm');
+    const addBtn = document.getElementById('addMarketItemBtn');
+    const itemsContainer = document.getElementById('marketItems');
+
+    if (!form || !addBtn || !itemsContainer) {
+        return;
+    }
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        handleAddMarketItem();
+    });
+
+    itemsContainer.addEventListener('click', (e) => {
+        const deleteBtn = e.target.closest('[data-market-delete]');
+        if (!deleteBtn) {
+            return;
+        }
+
+        const itemId = deleteBtn.getAttribute('data-market-delete');
+        removeMarketItem(itemId);
+    });
+}
+
+function handleAddMarketItem() {
+    const nameInput = document.getElementById('marketItemName');
+    const qtyInput = document.getElementById('marketItemQty');
+    const priceInput = document.getElementById('marketItemPrice');
+
+    if (!nameInput || !qtyInput || !priceInput) {
+        return;
+    }
+
+    const name = nameInput.value.trim();
+    const quantity = parseFloat(qtyInput.value.replace(',', '.'));
+    const price = parseFloat(priceInput.value.replace(',', '.'));
+
+    if (!name || Number.isNaN(quantity) || Number.isNaN(price) || quantity <= 0 || price < 0) {
+        alert('Preencha item, quantidade e valor corretamente.');
+        return;
+    }
+
+    marketItems.push({
+        id: `market-${Date.now()}`,
+        name,
+        quantity,
+        price
+    });
+
+    saveMarketList();
+    renderMarketItems();
+
+    nameInput.value = '';
+    qtyInput.value = '';
+    priceInput.value = '';
+    nameInput.focus();
+}
+
+function removeMarketItem(itemId) {
+    marketItems = marketItems.filter(item => item.id !== itemId);
+    saveMarketList();
+    renderMarketItems();
+}
+
+function renderMarketItems() {
+    const container = document.getElementById('marketItems');
+    const totalEl = document.getElementById('marketTotal');
+
+    if (!container || !totalEl) {
+        return;
+    }
+
+    container.innerHTML = '';
+
+    if (marketItems.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'market-empty';
+        empty.textContent = 'Nenhum item adicionado ainda.';
+        container.appendChild(empty);
+        totalEl.textContent = formatCurrency(0);
+        return;
+    }
+
+    let total = 0;
+
+    marketItems.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'market-row';
+
+        const name = document.createElement('div');
+        name.className = 'market-col market-name';
+        name.textContent = item.name;
+
+        const qty = document.createElement('div');
+        qty.className = 'market-col market-qty';
+        qty.textContent = item.quantity.toString();
+
+        const price = document.createElement('div');
+        price.className = 'market-col market-price';
+        price.textContent = formatCurrency(item.price);
+
+        const lineTotal = item.quantity * item.price;
+        total += lineTotal;
+
+        const lineTotalEl = document.createElement('div');
+        lineTotalEl.className = 'market-col market-line-total';
+        lineTotalEl.textContent = formatCurrency(lineTotal);
+
+        const actions = document.createElement('div');
+        actions.className = 'market-col market-actions';
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn-icon delete';
+        deleteBtn.type = 'button';
+        deleteBtn.textContent = '🗑️';
+        deleteBtn.setAttribute('data-market-delete', item.id);
+
+        actions.appendChild(deleteBtn);
+
+        row.appendChild(name);
+        row.appendChild(qty);
+        row.appendChild(price);
+        row.appendChild(lineTotalEl);
+        row.appendChild(actions);
+
+        container.appendChild(row);
+    });
+
+    totalEl.textContent = formatCurrency(total);
+}
+
+function formatCurrency(value) {
+    return value.toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    });
 }
 
 // Setup abas de navegação

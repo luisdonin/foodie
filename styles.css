@@ -397,6 +397,93 @@ footer {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
+/* Mercado */
+.market-container {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.market-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.market-row-inputs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.market-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.market-list-header {
+    display: grid;
+    grid-template-columns: 2fr 0.8fr 1fr 1fr auto;
+    gap: 10px;
+    font-weight: 700;
+    color: #555;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    padding: 0 10px;
+}
+
+.market-row {
+    display: grid;
+    grid-template-columns: 2fr 0.8fr 1fr 1fr auto;
+    gap: 10px;
+    align-items: center;
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 12px 10px;
+    font-size: 0.95rem;
+    color: #333;
+}
+
+.market-col {
+    display: flex;
+    align-items: center;
+}
+
+.market-name {
+    font-weight: 600;
+}
+
+.market-actions {
+    justify-content: flex-end;
+}
+
+.market-empty {
+    text-align: center;
+    padding: 20px;
+    color: #777;
+    background: #f8f9fa;
+    border-radius: 10px;
+    font-size: 0.95rem;
+}
+
+.market-total {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #333;
+}
+
 .profile-picture-section {
     display: flex;
     flex-direction: column;
@@ -755,5 +842,23 @@ footer {
 
     .meal-item-actions {
         opacity: 1;
+    }
+
+    .market-list-header {
+        display: none;
+    }
+
+    .market-row {
+        grid-template-columns: 1fr 1fr;
+        row-gap: 8px;
+    }
+
+    .market-name {
+        grid-column: span 2;
+    }
+
+    .market-actions {
+        grid-column: span 2;
+        justify-content: flex-end;
     }
 }

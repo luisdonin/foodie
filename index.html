@@ -17,6 +17,7 @@
         <div class="nav-tabs">
             <button class="tab-btn active" id="tabDiet" data-tab="diet">📊 Dieta</button>
             <button class="tab-btn" id="tabProfile" data-tab="profile">👤 Perfil</button>
+            <button class="tab-btn" id="tabMarket" data-tab="market">🛒 Mercado</button>
         </div>
 
         <!-- Seção de Dieta -->
@@ -91,6 +92,48 @@
                         <button class="btn btn-primary" id="saveProfileBtn">💾 Salvar Perfil</button>
                         <button class="btn btn-secondary" id="clearProfileBtn">🗑️ Limpar Dados</button>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção de Mercado -->
+        <div class="tab-content" id="marketTab">
+            <div class="market-container">
+                <form class="market-form" id="marketForm">
+                    <div class="form-group">
+                        <label for="marketItemName">Item</label>
+                        <input type="text" id="marketItemName" placeholder="Ex: Arroz" maxlength="60" required>
+                    </div>
+
+                    <div class="market-row-inputs">
+                        <div class="form-group">
+                            <label for="marketItemQty">Quantidade</label>
+                            <input type="number" id="marketItemQty" placeholder="1" min="0.01" step="0.01" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="marketItemPrice">Valor (R$)</label>
+                            <input type="number" id="marketItemPrice" placeholder="0,00" min="0" step="0.01" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="addMarketItemBtn">➕ Adicionar</button>
+                </form>
+
+                <div class="market-list">
+                    <div class="market-list-header">
+                        <span>Item</span>
+                        <span>Qtd.</span>
+                        <span>Valor</span>
+                        <span>Total</span>
+                        <span></span>
+                    </div>
+                    <div id="marketItems"></div>
+                </div>
+
+                <div class="market-total">
+                    <span>Valor total</span>
+                    <span id="marketTotal">R$ 0,00</span>
                 </div>
             </div>
         </div>
