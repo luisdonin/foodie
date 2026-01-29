@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Foodie - Seu plano de dieta personalizado">
+    <title>Foodie - Plano de Dieta</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>🍽️ Foodie</h1>
+            <p class="subtitle">Seu plano de dieta personalizado</p>
+        </header>
+
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+            <div class="card">
+                <div class="card-icon">🔥</div>
+                <div class="card-content">
+                    <div class="card-value" id="totalCalories">0</div>
+                    <div class="card-label">Calorias</div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-icon">🍴</div>
+                <div class="card-content">
+                    <div class="card-value" id="totalMeals">0</div>
+                    <div class="card-label">Refeições</div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-icon">💪</div>
+                <div class="card-content">
+                    <div class="card-value" id="totalProtein">0g</div>
+                    <div class="card-label">Proteína</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Meal Form -->
+        <div class="add-meal-section">
+            <h2>Adicionar Refeição</h2>
+            <form id="mealForm" class="meal-form">
+                <div class="form-group">
+                    <label for="mealName">Nome da Refeição</label>
+                    <input type="text" id="mealName" placeholder="Ex: Café da manhã" required>
+                </div>
+                <div class="form-group">
+                    <label for="mealFood">Alimentos</label>
+                    <input type="text" id="mealFood" placeholder="Ex: Ovos, pão integral, café" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="mealCalories">Calorias</label>
+                        <input type="number" id="mealCalories" placeholder="500" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="mealProtein">Proteína (g)</label>
+                        <input type="number" id="mealProtein" placeholder="25" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary">Adicionar Refeição</button>
+            </form>
+        </div>
+
+        <!-- Meals List -->
+        <div class="meals-section">
+            <h2>Suas Refeições</h2>
+            <div id="mealsList" class="meals-list">
+                <div class="empty-state">
+                    <p>Nenhuma refeição adicionada ainda.</p>
+                    <p>Comece adicionando sua primeira refeição!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Feito com ❤️ para uma vida mais saudável</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
