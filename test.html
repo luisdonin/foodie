@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste - Detecção de Dias</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .test-result {
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 4px solid #4CAF50;
+            background: #f1f8f4;
+        }
+        .test-result.error {
+            border-left-color: #f44336;
+            background: #fef5f5;
+        }
+        code {
+            background: #e0e0e0;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Teste de Detecção de Dias da Semana</h1>
+        
+        <div id="testResults"></div>
+
+        <h2>🧪 Teste Interativo</h2>
+        <p>Selecione um dia para simular:</p>
+        <select id="daySelector" onchange="testDay()">
+            <option value="">-- Selecione um dia --</option>
+            <option value="0">Domingo (0)</option>
+            <option value="1">Segunda (1)</option>
+            <option value="2">Terça (2)</option>
+            <option value="3">Quarta (3)</option>
+            <option value="4">Quinta (4)</option>
+            <option value="5">Sexta (5)</option>
+            <option value="6">Sábado (6)</option>
+        </select>
+        <div id="testOutput"></div>
+    </div>
+
+    <script>
+        // Carregar as funções do script.js
+        const dietPlan = [
+            { day: 1, emoji: '🌅', meals: [] },
+            { day: 2, emoji: '🌄', meals: [] },
+            { day: 3, emoji: '🌆', meals: [] },
+            { day: 4, emoji: '🌇', meals: [] },
+            { day: 5, emoji: '🌉', meals: [] }
+        ];
+
+        function getCurrentWeekday() {
+            const today = new Date();
+            const day = today.getDay();
+            if (day >= 1 && day <= 5) {
+                return day;
+            }
+            return null;
+        }
+
+        function getWeekdayNames() {
+            return ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+        }
+
+        function testDayLogic(dayOfWeek) {
+            const weekdayNames = getWeekdayNames();
+            
+            if (dayOfWeek === null || dayOfWeek === 0 || dayOfWeek === 6) {
+                return {
+                    isWeekend: true,
+                    message: '🎉 Dieta Livre',
+                    description: 'Aproveite seu fim de semana!'
+                };
+            } else {
+                const dietDay = dayOfWeek;
+                const dayName = weekdayNames[dayOfWeek];
+                const dayEmoji = dietPlan[dietDay - 1].emoji;
+                
+                return {
+                    isWeekend: false,
+                    message: `${dayEmoji} ${dayName}`,
+                    description: `Mostrando rotina do Dia ${dietDay}`,
+                    dietDay: dietDay
+                };
+            }
+        }
+
+        // Teste de hoje
+        function runTests() {
+            const resultsDiv = document.getElementById('testResults');
+            const today = new Date();
+            const currentDay = today.getDay();
+            const result = testDayLogic(currentDay);
+            
+            resultsDiv.innerHTML += `
+                <div class="test-result">
+                    <h3>📅 Teste de Hoje (${today.toLocaleDateString('pt-BR')})</h3>
+                    <p><strong>Dia da semana:</strong> ${getWeekdayNames()[currentDay]} (${currentDay})</p>
+                    <p><strong>Resultado esperado:</strong> ${result.message}</p>
+                    <p><strong>Descrição:</strong> ${result.description}</p>
+                </div>
+            `;
+
+            // Testes para todos os dias
+            resultsDiv.innerHTML += '<h3>📊 Testes para todos os dias da semana:</h3>';
+            for (let i = 0; i < 7; i++) {
+                const testResult = testDayLogic(i);
+                const className = testResult.isWeekend ? 'test-result error' : 'test-result';
+                resultsDiv.innerHTML += `
+                    <div class="${className}">
+                        <strong>${getWeekdayNames()[i]}:</strong> ${testResult.message} - ${testResult.description}
+                    </div>
+                `;
+            }
+        }
+
+        function testDay() {
+            const selector = document.getElementById('daySelector');
+            const output = document.getElementById('testOutput');
+            const dayValue = parseInt(selector.value);
+
+            if (isNaN(dayValue)) {
+                output.innerHTML = '';
+                return;
+            }
+
+            const result = testDayLogic(dayValue);
+            output.innerHTML = `
+                <div class="test-result">
+                    <h4>Resultado para ${getWeekdayNames()[dayValue]}:</h4>
+                    <p><strong>Mensagem:</strong> ${result.message}</p>
+                    <p><strong>Descrição:</strong> ${result.description}</p>
+                    ${result.dietDay ? `<p><strong>Dia da dieta:</strong> ${result.dietDay}</p>` : ''}
+                </div>
+            `;
+        }
+
+        // Executar testes quando a página carregar
+        window.addEventListener('load', runTests);
+    </script>
+</body>
+</html>

@@ -984,3 +984,46 @@ footer {
         gap: 4px;
     }
 }
+
+/* Dieta Livre - Fim de semana */
+.free-diet-card {
+    background: linear-gradient(135deg, #1a1f26 0%, #252b35 100%);
+    border: 2px solid #00d4ff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 212, 255, 0.15);
+}
+
+.free-diet-card .day-header {
+    background: linear-gradient(90deg, #00d4ff 0%, #0099cc 100%);
+    padding: 25px;
+    cursor: default;
+}
+
+.free-diet-card .day-header .day-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+}
+
+.free-diet-card .day-progress {
+    display: none;
+}
+
+.free-diet-message {
+    padding: 40px 25px;
+    text-align: center;
+}
+
+.free-diet-message p {
+    font-size: 1.1rem;
+    color: #8b92a0;
+    margin: 15px 0;
+    line-height: 1.6;
+}
+
+.free-diet-message p:first-child {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #00d4ff;
+}

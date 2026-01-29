@@ -251,6 +251,23 @@ let userXP = { level: 1, totalXP: 0 };
 let marketItems = [];
 let marketHistory = [];
 
+// Get current weekday
+function getCurrentWeekday() {
+    const today = new Date();
+    const day = today.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    
+    // Return day number (1-5 for Mon-Fri, null for Sat-Sun)
+    if (day >= 1 && day <= 5) {
+        return day; // 1 = Monday, 2 = Tuesday, ..., 5 = Friday
+    }
+    return null; // Saturday or Sunday
+}
+
+// Get weekday names
+function getWeekdayNames() {
+    return ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     loadProgress();
@@ -289,10 +306,39 @@ function renderDays() {
     const container = document.getElementById('daysContainer');
     container.innerHTML = '';
 
-    dietPlan.forEach(dayData => {
-        const dayCard = createDayCard(dayData);
+    const currentDay = getCurrentWeekday();
+    
+    if (currentDay === null) {
+        // Weekend - show "Dieta Livre"
+        const freeDietCard = document.createElement('div');
+        freeDietCard.className = 'day-card free-diet-card';
+        freeDietCard.innerHTML = `
+            <div class="day-header">
+                <span class="day-title">🎉 Dieta Livre</span>
+            </div>
+            <div class="day-content">
+                <div class="free-diet-message">
+                    <p>Aproveite seu fim de semana!</p>
+                    <p>A rotina de dieta retoma na próxima segunda-feira.</p>
+                </div>
+            </div>
+        `;
+        container.appendChild(freeDietCard);
+    } else {
+        // Weekday - show only today's diet
+        const dayData = dietPlan[currentDay - 1];
+        const weekdayNames = getWeekdayNames();
+        const dayName = weekdayNames[currentDay];
+        
+        // Create a modified day data with the weekday name
+        const modifiedDayData = {
+            ...dayData,
+            dayName: dayName
+        };
+        
+        const dayCard = createDayCard(modifiedDayData);
         container.appendChild(dayCard);
-    });
+    }
 }
 
 // Create a day card
@@ -308,9 +354,10 @@ function createDayCard(dayData) {
     header.onclick = () => toggleDay(card, dayId);
 
     const dayProgress = calculateDayProgress(dayData.day);
+    const dayName = dayData.dayName || `Dia ${dayData.day}`;
     
     header.innerHTML = `
-        <span class="day-title">${dayData.emoji} Dia ${dayData.day}</span>
+        <span class="day-title">${dayData.emoji} ${dayName}</span>
         <span class="day-progress">${dayProgress.completed}/${dayProgress.total}</span>
     `;
 
