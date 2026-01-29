@@ -13,14 +13,27 @@ class FoodieApp {
             this.addMeal();
         });
 
+        // Event delegation for delete buttons
+        document.getElementById('mealsList').addEventListener('click', (e) => {
+            if (e.target.classList.contains('btn-delete')) {
+                const mealId = parseInt(e.target.dataset.mealId);
+                this.deleteMeal(mealId);
+            }
+        });
+
         // Render initial meals
         this.renderMeals();
         this.updateSummary();
     }
 
     loadMeals() {
-        const stored = localStorage.getItem('foodie-meals');
-        return stored ? JSON.parse(stored) : [];
+        try {
+            const stored = localStorage.getItem('foodie-meals');
+            return stored ? JSON.parse(stored) : [];
+        } catch (error) {
+            console.error('Error loading meals from localStorage:', error);
+            return [];
+        }
     }
 
     saveMeals() {
@@ -35,6 +48,11 @@ class FoodieApp {
 
         if (!name || !food || !calories || !protein) {
             alert('Por favor, preencha todos os campos!');
+            return;
+        }
+
+        if (calories <= 0 || protein <= 0) {
+            alert('Calorias e proteína devem ser valores positivos!');
             return;
         }
 
@@ -85,7 +103,7 @@ class FoodieApp {
                 <div class="meal-item">
                     <div class="meal-header">
                         <div class="meal-name">${this.escapeHtml(meal.name)}</div>
-                        <button class="btn-delete" onclick="app.deleteMeal(${meal.id})">
+                        <button class="btn-delete" data-meal-id="${meal.id}" aria-label="Excluir ${this.escapeHtml(meal.name)}">
                             Excluir
                         </button>
                     </div>

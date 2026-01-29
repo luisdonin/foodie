@@ -46,20 +46,20 @@
             <form id="mealForm" class="meal-form">
                 <div class="form-group">
                     <label for="mealName">Nome da Refeição</label>
-                    <input type="text" id="mealName" placeholder="Ex: Café da manhã" required>
+                    <input type="text" id="mealName" placeholder="Ex: Café da manhã" maxlength="50" required>
                 </div>
                 <div class="form-group">
                     <label for="mealFood">Alimentos</label>
-                    <input type="text" id="mealFood" placeholder="Ex: Ovos, pão integral, café" required>
+                    <input type="text" id="mealFood" placeholder="Ex: Ovos, pão integral, café" maxlength="200" required>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label for="mealCalories">Calorias</label>
-                        <input type="number" id="mealCalories" placeholder="500" required>
+                        <input type="number" id="mealCalories" placeholder="500" min="1" max="9999" step="1" required>
                     </div>
                     <div class="form-group">
                         <label for="mealProtein">Proteína (g)</label>
-                        <input type="number" id="mealProtein" placeholder="25" required>
+                        <input type="number" id="mealProtein" placeholder="25" min="1" max="999" step="1" required>
                     </div>
                 </div>
                 <button type="submit" class="btn-primary">Adicionar Refeição</button>
