@@ -240,19 +240,23 @@ const dietPlan = [
 const STORAGE_KEY = 'dietProgress';
 const CUSTOM_ITEMS_KEY = 'dietCustomItems';
 const PROFILE_KEY = 'userProfile';
+const XP_KEY = 'userXP';
 let checkedItems = {};
 let customItems = {};
 let currentEditingItemId = null;
 let userProfile = {};
+let userXP = { level: 1, totalXP: 0 };
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     loadProgress();
     loadProfile();
+    loadXP();
     renderDays();
     setupEventListeners();
     setupTabNavigation();
     setupProfileListeners();
+    updateXPDisplay();
 });
 
 // Load progress from localStorage
@@ -353,6 +357,12 @@ function createMealElement(dayNumber, meal) {
         checkbox.checked = isChecked;
         checkbox.onchange = () => {
             checkedItems[itemId] = checkbox.checked;
+            
+            // Ganhar XP ao completar um item
+            if (checkbox.checked) {
+                addXP(10); // 10 XP por item
+            }
+            
             saveProgress();
             updateDayProgress(dayNumber);
         };
@@ -603,7 +613,95 @@ function deleteCustomItem(itemId, itemElement, dayNumber) {
     }
 }
 
-// Carregar perfil
+// Sistema de XP - RPG
+function loadXP() {
+    const saved = localStorage.getItem(XP_KEY);
+    userXP = saved ? JSON.parse(saved) : { level: 1, totalXP: 0 };
+}
+
+function saveXP() {
+    localStorage.setItem(XP_KEY, JSON.stringify(userXP));
+}
+
+function addXP(amount) {
+    userXP.totalXP += amount;
+    
+    // Calcular XP necessário para próximo nível
+    const xpForNextLevel = getXPForLevel(userXP.level + 1);
+    
+    // Verificar se subiu de nível
+    if (userXP.totalXP >= xpForNextLevel) {
+        userXP.level++;
+        showLevelUpPopup();
+    }
+    
+    saveXP();
+    updateXPDisplay();
+    showXPNotification(amount);
+}
+
+function getXPForLevel(level) {
+    // Sistema de progressão: 100 XP para nível 2, 200 para nível 3, etc
+    return level * 100;
+}
+
+function getXPForCurrentLevel() {
+    return userXP.level * 100;
+}
+
+function getCurrentLevelProgress() {
+    const currentLevelXP = userXP.level === 1 ? 0 : getXPForLevel(userXP.level);
+    const nextLevelXP = getXPForLevel(userXP.level + 1);
+    const progressInLevel = userXP.totalXP - currentLevelXP;
+    const xpNeededInLevel = nextLevelXP - currentLevelXP;
+    
+    return {
+        current: progressInLevel,
+        needed: xpNeededInLevel,
+        percentage: (progressInLevel / xpNeededInLevel) * 100
+    };
+}
+
+function updateXPDisplay() {
+    const progress = getCurrentLevelProgress();
+    
+    document.getElementById('levelNumber').textContent = userXP.level;
+    document.getElementById('xpBarFill').style.width = progress.percentage + '%';
+    document.getElementById('xpText').textContent = `${progress.current} / ${progress.needed} XP`;
+}
+
+function showXPNotification(xp) {
+    const achievement = document.getElementById('xpAchievement');
+    
+    const popup = document.createElement('div');
+    popup.className = 'achievement-popup';
+    popup.innerHTML = `<span class="emoji">⭐</span> +${xp} XP`;
+    
+    achievement.innerHTML = '';
+    achievement.appendChild(popup);
+    
+    setTimeout(() => {
+        popup.style.opacity = '0';
+        popup.style.transition = 'opacity 0.3s ease';
+    }, 1500);
+}
+
+function showLevelUpPopup() {
+    const achievement = document.getElementById('xpAchievement');
+    
+    const popup = document.createElement('div');
+    popup.className = 'level-up-popup';
+    popup.innerHTML = `<span class="emoji">🎉</span> LEVEL UP! Nível ${userXP.level}`;
+    
+    achievement.innerHTML = '';
+    achievement.appendChild(popup);
+    
+    setTimeout(() => {
+        popup.style.opacity = '0';
+        popup.style.transition = 'opacity 0.3s ease';
+    }, 2500);
+}
+
 function loadProfile() {
     const saved = localStorage.getItem(PROFILE_KEY);
     userProfile = saved ? JSON.parse(saved) : {
@@ -714,6 +812,42 @@ function setupProfileListeners() {
             userProfile = {};
             updateIMC();
             alert('✅ Dados do perfil limpos!');
+        }
+    });
+}
+
+// Setup Tab Navigation
+function setupTabNavigation() {
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabName = btn.getAttribute('data-tab');
+            
+            // Remove active de todos os botões e conteúdos
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            
+            // Adiciona active ao clicado
+            btn.classList.add('active');
+            document.getElementById(tabName + 'Tab').classList.add('active');
+        });
+    });
+}
+
+// Setup Profile Listeners
+function setupProfileListeners() {
+    document.getElementById('photoInput').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                document.getElementById('profileImage').src = event.target.result;
+                userProfile.photo = event.target.result;
+                saveProfile();
+            };
+            reader.readAsDataURL(file);
         }
     });
 }

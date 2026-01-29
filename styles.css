@@ -79,6 +79,145 @@ header h1 {
     color: #667eea;
 }
 
+/* Sistema de XP */
+.xp-system {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+}
+
+.xp-header {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.level-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.5);
+    color: white;
+    flex-shrink: 0;
+    backdrop-filter: blur(10px);
+}
+
+.level-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.level-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.xp-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.xp-bar-container {
+    width: 100%;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.xp-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #FFD700 0%, #FFA500 100%);
+    border-radius: 10px;
+    transition: width 0.5s ease;
+    width: 0%;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+
+.xp-text {
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.xp-achievement {
+    margin-top: 15px;
+    min-height: 30px;
+}
+
+.achievement-popup {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 12px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    font-size: 0.95rem;
+    animation: slideUp 0.5s ease;
+    border-left: 4px solid #FFD700;
+}
+
+.achievement-popup .emoji {
+    font-size: 1.5rem;
+}
+
+.level-up-popup {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, rgba(255, 255, 0, 0.3) 0%, rgba(255, 165, 0, 0.3) 100%);
+    padding: 15px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    animation: levelUpPop 0.6s ease;
+    border: 2px solid #FFD700;
+}
+
+.level-up-popup .emoji {
+    font-size: 2rem;
+    animation: bounce 0.6s ease;
+}
+
+@keyframes levelUpPop {
+    0% {
+        opacity: 0;
+        transform: scale(0.8) translateY(20px);
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1) translateY(-20px);
+    }
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.3);
+    }
+}
+
 .days-container {
     display: flex;
     flex-direction: column;
